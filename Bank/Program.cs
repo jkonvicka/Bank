@@ -19,15 +19,11 @@ namespace DemeterLawCodeExample
             orders.Add(order);
         }
 
-        // violating Demeter's law by accessing the name of the products in the order
-        public void PrintProductNames()
+        public void PrintOrders()
         {
             foreach (Order order in orders)
             {
-                foreach (Product product in order.Products)
-                {
-                    Console.WriteLine(product.GetName());
-                }
+                order.Print();
             }
         }
     }
@@ -46,9 +42,12 @@ namespace DemeterLawCodeExample
             products.Add(product);
         }
 
-        public List<Product> Products
+        public void Print()
         {
-            get { return products; }
+            foreach (Product product in products)
+            {
+                Console.WriteLine(product.GetName());
+            }
         }
     }
 
@@ -79,7 +78,7 @@ namespace DemeterLawCodeExample
             Order order2 = new Order();
             order2.AddProduct(new Product("Product C"));
             customer.AddOrder(order2);
-            customer.PrintProductNames();
+            customer.PrintOrders();
         }
     }
 }
