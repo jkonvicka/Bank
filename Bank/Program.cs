@@ -1,46 +1,85 @@
-﻿public class BankAccount
+﻿using System;
+using System.Collections.Generic;
+
+namespace DemeterLawCodeExample
 {
-    private decimal balance;
-    private Customer customer;
-
-    public BankAccount(Customer customer, decimal balance)
+    class Customer
     {
-        this.customer = customer;
-        this.balance = balance;
+        private string name;
+        private List<Order> orders;
+
+        public Customer(string name)
+        {
+            this.name = name;
+            orders = new List<Order>();
+        }
+
+        public void AddOrder(Order order)
+        {
+            orders.Add(order);
+        }
+
+        // violating Demeter's law by accessing the name of the products in the order
+        public void PrintProductNames()
+        {
+            foreach (Order order in orders)
+            {
+                foreach (Product product in order.Products)
+                {
+                    Console.WriteLine(product.GetName());
+                }
+            }
+        }
     }
 
-    public void TransferMoneyTo(BankAccount destinationAccount, decimal amount)
+    class Order
     {
-        // Invalid use of Law of Demeter
-        destinationAccount.customer.NotifyTransfer(amount);
-        
-        this.balance -= amount;
-        destinationAccount.balance += amount;
+        private List<Product> products;
+
+        public Order()
+        {
+            products = new List<Product>();
+        }
+
+        public void AddProduct(Product product)
+        {
+            products.Add(product);
+        }
+
+        public List<Product> Products
+        {
+            get { return products; }
+        }
     }
-}
 
-public class Customer
-{
-    private string name;
-    private string email;
-
-    public Customer(string name, string email)
+    class Product
     {
-        this.name = name;
-        this.email = email;
+        private string name;
+
+        public Product(string name)
+        {
+            this.name = name;
+        }
+
+        public string GetName()
+        {
+            return name;
+        }
     }
 
-    public void NotifyTransfer(decimal amount)
+    class Program
     {
-        Console.WriteLine($"Dear {name}, an amount of {amount} has been transferred to your account.");
-        EmailSender.SendEmail(email, "Money transfer", $"An amount of {amount} has been transferred to your account.");
-    }
-}
-
-public class EmailSender
-{
-    public static void SendEmail(string email, string subject, string body)
-    {
-        Console.WriteLine($"Email sent to {email} with subject '{subject}' and body '{body}'");
+        static void Main(string[] args)
+        {
+            Customer customer = new Customer("John Doe");
+            Order order1 = new Order();
+            order1.AddProduct(new Product("Product A"));
+            order1.AddProduct(new Product("Product B"));
+            customer.AddOrder(order1);
+            Order order2 = new Order();
+            order2.AddProduct(new Product("Product C"));
+            customer.AddOrder(order2);
+            customer.PrintProductNames();
+        }
     }
 }
